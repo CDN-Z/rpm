@@ -26,3 +26,8 @@ Requires:       openssl
 Requires:       zlib
 Provides:       webserver
 Conflicts:      nginx
+
+%define         nginx_version 3.0.12
+
+
+Source0:        nginx-%{nginx_version}.tar.gz
