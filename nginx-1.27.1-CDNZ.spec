@@ -27,7 +27,16 @@ Requires:       zlib
 Provides:       webserver
 Conflicts:      nginx
 
-%define         nginx_version 3.0.12
+%define         nginx_version 1.27.1.2
 
+Source0:        https://openresty.org/download/openresty-%{version}.tar.gz
+Source1:        nginx.service
+Source2:        nginx.logrotate
+Source3:        nginx.conf
 
-Source0:        nginx-%{nginx_version}.tar.gz
+# Open-Resty Core
+Source100:      https://github.com/CDN-Z/lua-resty-core/archive/refs/tags/lua-resty-core.tar.gz
+Source101:      https://github.com/CDN-Z/lua-resty-lrucache/archive/refs/tags/lua-resty-lrucache.tar.gz
+Source102:      https://github.com/CDN-Z/lua-nginx-module/archive/refs/tags/lua-nginx-module.tar.gz
+
+# Logging

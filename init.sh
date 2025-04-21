@@ -7,7 +7,7 @@ dnf install -y rpm-build rpmdevtools dnf-utils createrepo yum-utils wget git \
     libxslt-devel gd-devel perl-devel pam-devel perl-core lksctp-tools-devel \
     vim
 
-# Install openSSL 3.15
+# Install openSSL 3.5
 install_openssl() {
     # Exit on any error
     set -e
@@ -79,14 +79,11 @@ install_luajit() {
     echo "Downloading LuaJIT ${LUAJIT_VERSION}..."
     curl -L -o ${LUAJIT_TAR} ${LUAJIT_URL}
 
-    # Extract tarball
     echo "Extracting ${LUAJIT_TAR}..."
     tar -xzf ${LUAJIT_TAR}
 
-    # Change to extracted directory
     cd luajit2-${LUAJIT_VERSION}
 
-    # Compile and install LuaJIT
     echo "Compiling and installing LuaJIT..."
     make -j$(nproc) PREFIX=${INSTALL_DIR}
     make install PREFIX=${INSTALL_DIR}
@@ -99,7 +96,36 @@ install_luajit() {
 
     # Create symlink for luajit executable (optional, for convenience)
     ln -sf ${INSTALL_DIR}/bin/luajit-${LUAJIT_VERSION} /usr/local/bin/luajit
-    export PATH=/usr/local/luajit/bin/luajit:$PATH
 }
 
-install_luajit
+download_github_repo() {
+  local branch_or_commit_opt=$1
+  local branch_or_commit=$2
+  local user_repo=$3
+
+  local user=${user_repo%%/*}
+  local repo=${user_repo##*/}
+
+  if [ -d $repo ]; then
+    rm -rf ${repo}
+  fi
+
+  local commit
+  case "$branch_or_commit_opt" in
+  -b)
+    git clone --depth 1 -b ${branch_or_commit} --recurse-submodules https://github.com/${user}/${repo}.git > /dev/null 2>&1
+    commit=$(cd ${repo} && git rev-parse HEAD)
+    rm -rf ${repo}/.git
+    ;;
+  -c)
+    mkdir ${repo}
+    curl -sSL https://github.com/$user/$repo/archive/${commit}.tar.gz | tar zxf - --strip-component 1 -C ${repo}
+    commit=${branch_or_commit}
+    ;;
+  esac
+
+  tar cf - ${repo} | gzip -9 > SOURCES/${repo}.tar.gz
+  rm -rf ${repo}
+  echo "%define ${repo//-/_}_commit $commit"
+}
+
