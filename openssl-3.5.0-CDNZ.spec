@@ -14,7 +14,6 @@ BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -
 
 BuildRequires:      gcc, make, perl
 %if ! 0%{?suse_version}
-BuildRequires:      perl-IPC-Run, perl-IPC-Cmd, perl-Digest, perl-Digest-SHA
 %endif
 BuildRequires:      cdnz-zlib-devel >= 1.2.11
 Requires:           cdnz-zlib >= 1.2.11
@@ -74,6 +73,7 @@ fi
 
 %build
 ./config \
+    no-tests on-docs \
     shared zlib -g \
     --prefix=%{openssl_prefix} \
     --libdir=lib \
