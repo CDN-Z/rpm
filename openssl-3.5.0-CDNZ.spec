@@ -13,8 +13,6 @@ Source0:            https://github.com/openssl/openssl/releases/download/openssl
 BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:      gcc, make, perl
-%if ! 0%{?suse_version}
-%endif
 BuildRequires:      cdnz-zlib-devel >= 1.2.11
 Requires:           cdnz-zlib >= 1.2.11
 
@@ -73,7 +71,7 @@ fi
 
 %build
 ./config \
-    no-tests on-docs \
+    no-tests no-docs \
     shared zlib -g \
     --prefix=%{openssl_prefix} \
     --libdir=lib \
@@ -90,7 +88,6 @@ ncpus=`nproc`
 if [ "$ncpus" -gt 16 ]; then
     ncpus=16
 fi
-make CC='ccache gcc -fdiagnostics-color=always' -j$ncpus
 
 %install
 make install_sw DESTDIR=%{buildroot}
