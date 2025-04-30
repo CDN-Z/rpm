@@ -46,6 +46,8 @@ you will need to install %{name}-devel.
 # fix perms on auto files
 chmod u+x autogen.sh config.guess config.sub configure depcomp install-sh missing
 
+autoreconf -fi
+
 %build
 %configure --with-readline
 %{__perl} -pi -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g;' libtool
@@ -80,6 +82,9 @@ chmod u+x autogen.sh config.guess config.sub configure depcomp install-sh missin
 %{_libdir}/liblua*.so
 %dir %{_datadir}/lua/5.1
 %dir %{_libdir}/lua/5.1
+%{_datadir}/doc/lua/cover.png
+%{_datadir}/doc/lua/lua.css
+%{_datadir}/doc/lua/manual.css
 
 %files devel
 %defattr(-, root, root, 0755)
@@ -87,6 +92,7 @@ chmod u+x autogen.sh config.guess config.sub configure depcomp install-sh missin
 %{_includedir}/lua.h
 %{_includedir}/lua.hpp
 %{_includedir}/luaconf.h
+%{_includedir}/luaconf_site.h
 %{_includedir}/lualib.h
 %{_libdir}/liblua.a
 %{_libdir}/liblua.so

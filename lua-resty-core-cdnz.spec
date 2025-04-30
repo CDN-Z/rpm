@@ -7,9 +7,12 @@ URL:        https://github.com/CDN-Z/lua-resty-core
 
 Source0:    https://github.com/CDN-Z/lua-resty-core/archive/refs/tags/v%{version}.tar.gz
 
-BuildRequires: lua-filesystem
+BuildArch:      noarch
+BuildRequires:  cdnz-luajit
+Requires:       cdnz-luajit
 
-%define prefix     /usr/local/cdnz
+%define lua_ver    5.1
+%define _luapkgdir %{_datadir}/lua/%{lua_ver}
 
 # For Rocky Linux 9.3
 %if 0%{?rhel} >= 9
@@ -19,16 +22,23 @@ BuildRequires: lua-filesystem
 %endif
 
 %description
-lua-resty-core is a library for OpenResty and Nginx Lua module, providing core functionalities.
+New FFI-based Lua API for ngx_http_lua_module and/or
+ngx_stream_lua_module
 
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-# No compilation required, as lua-resty-core is a pure Lua module
 
 %install
-make install
+install -d %{buildroot}%{_luapkgdir}/resty/core
+install -d -p %{buildroot}%{_luapkgdir}/ngx/ssl
+install lib/resty/*.lua %{buildroot}%{_luapkgdir}/resty/
+install lib/resty/core/*.lua %{buildroot}%{_luapkgdir}/resty/core/
+install lib/ngx/*.lua %{buildroot}%{_luapkgdir}/ngx/
+install lib/ngx/ssl/*.lua %{buildroot}%{_luapkgdir}/ngx/ssl/
 
-%clean
-rm -rf %{buildroot}
+%files
+%doc README.markdown
+%{_luapkgdir}/resty/*
+%{_luapkgdir}/ngx/*
