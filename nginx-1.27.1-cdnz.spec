@@ -14,8 +14,8 @@ URL:        https://nginx.org/
 
 Source0:    https://nginx.org/download/nginx-%{version}.tar.gz
 
-Source1:    https://github.com/CDN-Z/lua-nginx-module/archive/refs/tags/v%{cdnz_version}.tar.gz
-Source2:    https://github.com/CDN-Z/ngx_devel_kit/archive/refs/tags/v%{cdnz_version}.tar.gz
+Source1:    https://github.com/CDN-Z/lua-nginx-module/archive/refs/tags/v%{cdnz_version}.tar.gz#/lua-nginx-module.tar.gz
+Source2:    https://github.com/CDN-Z/ngx_devel_kit/archive/refs/tags/v%{cdnz_version}.tar.gz#/ngx_devel_kit.tar.gz
 
 Source3:    cdnz.service
 Source4:    cdnz.init
@@ -55,12 +55,15 @@ OpenSSL 3.5.0, and various performance enhancements
 
 %prep
 %setup -q -n nginx-%{nginx_version}
-%setup -q -T -D -a 1
-%setup -q -T -D -a 2
+# %setup -q -T -D -a 1
+# %setup -q -T -D -a 2
+
+tar -xzf %{_sourcedir}/lua-nginx-module.tar.gz -C .
+tar -xzf %{_sourcedir}/ngx_devel_kit.tar.gz -C .
 
 %build
 LUAJIT_INC=%{luajit_inc} LUAJIT_LIB=%{luajit_lib} \
-.configure \
+./configure \
     --prefix=%{cdnz_prefix} \
     --with-cc='ccache gcc -fdiagnostics-color=always' \
     --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre2_prefix}/include -I%{openssl_prefix}/include" \
