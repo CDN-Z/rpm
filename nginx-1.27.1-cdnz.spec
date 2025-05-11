@@ -64,7 +64,7 @@ tar -xzf %{_sourcedir}/ngx_devel_kit.tar.gz -C .
 %build
 LUAJIT_INC=%{luajit_inc} LUAJIT_LIB=%{luajit_lib} \
 ./configure \
-    --prefix=%{cdnz_prefix} \
+    --prefix=%{nginx_prefix} \
     --with-cc='ccache gcc -fdiagnostics-color=always' \
     --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre2_prefix}/include -I%{openssl_prefix}/include" \
     --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre2_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre2_prefix}/lib:%{openssl_prefix}/lib" \
@@ -93,13 +93,10 @@ LUAJIT_INC=%{luajit_inc} LUAJIT_LIB=%{luajit_lib} \
     --with-file-aio \
     --with-pcre-jit \
     --with-compat \
-    --with-openssl=%{openssl_prefix} \
     --add-module=./lua-nginx-module-%{cdnz_version} \
-    --add-module=./ngx_devel_kit-%{cdnz_version} \
-    --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
-    -j`nproc`
+    --add-module=./ngx_devel_kit-%{cdnz_version}
 
-make -j`nproc`
+make %{?_smp_mflags}
 
 %pre
 getent group %{user} || groupadd -f -r %{user}
@@ -110,51 +107,46 @@ rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 
 mkdir -p %{buildroot}/usr/bin
+
 ln -sf %{cdnz_prefix}/bin/cdnz %{buildroot}/usr/bin/
 ln -sf %{cdnz_prefix}/nginx/sbin/nginx %{buildroot}/usr/bin/%{name}
 
 mkdir -p %{buildroot}/usr/lib/systemd/system/
 cp %{_sourcedir}/cdnz.service %{buildroot}/usr/lib/systemd/system/cdnz.service
 
+# to silence the check-rpath error
+export QA_RPATHS=$[ 0x0002 ]
+
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, 0755)
-
 %attr(755,root,root) /usr/lib/systemd/system/cdnz.service
+/usr/bin/cdnz
+/usr/bin/%{name}
 
-%{cdnz_prefix}/nginx
-%{cdnz_prefix}/nginx/html/*
-%{cdnz_prefix}/nginx/logs
-%{cdnz_prefix}/nginx/sbin
-%{cdnz_prefix}/nginx/sbin/nginx
-%{cdnz_prefix}/bin
-%{cdnz_prefix}/bin/cdnz
+%dir %{cdnz_prefix}
+%dir %{cdnz_prefix}/nginx
 
-%{cdnz_prefix}/nginx/conf
-%{cdnz_prefix}/nginx/conf/fastcgi.conf.default
-%{cdnz_prefix}/nginx/conf/fastcgi_params.default
-%{cdnz_prefix}/nginx/conf/mime.types.default
-%{cdnz_prefix}/nginx/conf/nginx.conf.default
-%{cdnz_prefix}/nginx/conf/scgi_params.default
-%{cdnz_prefix}/nginx/conf/uwsgi_params.default
+%dir %{nginx_prefix}
+%dir %{nginx_prefix}/html
+%dir %{nginx_prefix}/logs
+%dir %{nginx_prefix}/sbin
+%{nginx_prefix}/html/*
+%{nginx_prefix}/sbin/nginx
 
-%config %{cdnz_prefix}/nginx/conf/fastcgi.conf.default
-%config %{cdnz_prefix}/nginx/conf/scgi_params
-%config %{cdnz_prefix}/nginx/conf/uwsgi_params
-%config %{cdnz_prefix}/nginx/conf/fastcgi_params
-%config %{cdnz_prefix}/nginx/conf/koi-win
-%config %{cdnz_prefix}/nginx/conf/nginx.conf
-%config %{cdnz_prefix}/nginx/conf/mime.types.default
-%config %{cdnz_prefix}/nginx/conf/koi-utf
-%config %{cdnz_prefix}/nginx/conf/fastcgi_params.default
-%config %{cdnz_prefix}/nginx/conf/win-utf
-%config %{cdnz_prefix}/nginx/conf/uwsgi_params.default
-%config %{cdnz_prefix}/nginx/conf/nginx.conf.default
-%config %{cdnz_prefix}/nginx/conf/scgi_params.default
-%config %{cdnz_prefix}/nginx/conf/mime.types
-%config %{cdnz_prefix}/nginx/conf/fastcgi.conf
+%dir %{nginx_prefix}/conf
+%config(noreplace) %{nginx_prefix}/conf/fastcgi.conf
+%config(noreplace) %{nginx_prefix}/conf/fastcgi_params
+%config(noreplace) %{nginx_prefix}/conf/koi-utf
+%config(noreplace) %{nginx_prefix}/conf/koi-win
+%config(noreplace) %{nginx_prefix}/conf/mime.types
+%config(noreplace) %{nginx_prefix}/conf/nginx.conf
+%config(noreplace) %{nginx_prefix}/conf/scgi_params
+%config(noreplace) %{nginx_prefix}/conf/uwsgi_params
+%config(noreplace) %{nginx_prefix}/conf/win-utf
+%config(noreplace) %{nginx_prefix}/conf/*.default
 
 %preun
 
