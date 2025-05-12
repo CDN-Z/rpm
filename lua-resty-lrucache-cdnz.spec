@@ -13,6 +13,7 @@ Requires:       cdnz-luajit
 
 %define lua_ver    5.1
 %define _luapkgdir %{_datadir}/lua/%{lua_ver}
+%define luajit_prefix /usr/local/cdnz/luajit2.1
 
 # For Rocky Linux 9.3
 %if 0%{?rhel} >= 9
@@ -30,12 +31,12 @@ Lua module for LRU cache
 %build
 
 %install
-install -d %{buildroot}%{_luapkgdir}/resty/lrucache
+install -d %{buildroot}%{luajit_prefix}/resty/lrucache
 
-install lib/resty/*.lua %{buildroot}%{_luapkgdir}/resty/
-install lib/resty/lrucache/*.lua %{buildroot}%{_luapkgdir}/resty/lrucache/
+install lib/resty/*.lua %{buildroot}%{luajit_prefix}/resty/
+install lib/resty/lrucache/*.lua %{buildroot}%{luajit_prefix}/resty/lrucache/
 
 %files
 %doc README.markdown
-%{_luapkgdir}/resty/*
-%{_luapkgdir}/resty/lrucache/*
+%{luajit_prefix}/resty/*
+%{luajit_prefix}/resty/lrucache/*

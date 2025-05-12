@@ -100,7 +100,7 @@ make %{?_smp_mflags}
 
 %pre
 getent group %{user} || groupadd -f -r %{user}
-getent passwd %{user} || useradd -M -d %{homedir} -g %{user} -s /bin/nologin %{user}
+getent passwd %{user} || useradd -M -g %{user} -s /bin/nologin %{user}
 
 %install
 rm -rf %{buildroot}
