@@ -5,7 +5,7 @@ Summary:    Install lua-resty-lrucache for CDNZ
 License:    BSD
 URL:        https://github.com/CDN-Z/lua-resty-lrucache
 
-Source0:    https://github.com/CDN-Z/lua-resty-lrucache/archive/refs/tags/v%{version}.tar.gz
+Source0:    https://github.com/CDN-Z/lua-resty-lrucache/archive/refs/tags/v%{version}.tar.gz#%{name}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  cdnz-luajit

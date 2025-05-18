@@ -5,7 +5,7 @@ Summary:    Install lua-resty-core for CDNZ
 License:    BSD
 URL:        https://github.com/CDN-Z/lua-resty-core
 
-Source0:    https://github.com/CDN-Z/lua-resty-core/archive/refs/tags/v%{version}.tar.gz
+Source0:    https://github.com/CDN-Z/lua-resty-core/archive/refs/tags/v%{version}.tar.gz#%{name}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  cdnz-luajit
